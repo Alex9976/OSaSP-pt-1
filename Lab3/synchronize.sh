@@ -1,2 +1,2 @@
 #!/bin/bash
-echo "* * * * * "rsync --archive $1 $2:~/Backup | crontab
+echo "* * * * * "$1./copy.sh $2 $3 | crontab
