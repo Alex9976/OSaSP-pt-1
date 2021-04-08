@@ -17,7 +17,14 @@ int copy(char *src, char *dest)
     char buf[BUF_SIZE];
     struct stat stat_buf, stat_src;
     mode_t mode = 0;
+    int rval;
 
+    rval = access(src, R_OK);
+    if (rval != 0)
+    {
+        fprintf(stderr, "Cannot read file\n");
+        exit(0);
+    }
     ifd = open(src, O_RDONLY);
     if (ifd == 0)
     {
@@ -33,7 +40,9 @@ int copy(char *src, char *dest)
     }
 
     while (rcnt = read(ifd, buf, BUF_SIZE))
+    {
         write(ofd, buf, rcnt);
+    }
 
     stat(src, &stat_src);
     mode = stat_src.st_mode;
@@ -73,7 +82,7 @@ int main(int argc, char *argv[])
     }
 #endif
 
-    int pid;    
+    int pid;
     DIR *dir;
     struct dirent *ent;
     int num_of_proc = 0;
@@ -103,7 +112,7 @@ int main(int argc, char *argv[])
                 src_file = concat(src_directory, ent->d_name);
                 dest_file = concat(dest_directory, ent->d_name);
                 if (fopen(dest_file, "r") == NULL)
-                {                    
+                {
                     switch (pid = fork())
                     {
                     case -1:
@@ -113,7 +122,7 @@ int main(int argc, char *argv[])
                         printf("\nPid: %i\nPath: %s\nCopied: %d bytes\n", getpid(), src_file, copy(src_file, dest_file));
                         exit(0);
                         break;
-                    default:                      
+                    default:
                         num_of_proc++;
                         while (num_of_proc > max_proc)
                         {
